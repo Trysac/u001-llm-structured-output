@@ -41,7 +41,7 @@ def _path(loc: Iterable[int | str]) -> str:
 
 
 def _schema_error(exc: ValidationError, repairs: tuple[Repair, ...]) -> SchemaValidationError:
-    details = exc.errors()
+    details = exc.errors(include_input=False, include_url=False)
     errors = [(_clip(_path(e["loc"])), _clip(e["msg"])) for e in details[:_MAX_ERRORS]]
     return SchemaValidationError(errors, repairs=repairs, total=len(details))
 
@@ -75,7 +75,7 @@ def parse_reply(
     try:
         value = model.model_validate(payload, strict=strict)
     except ValidationError as exc:
-        raise _schema_error(exc, repairs) from exc
+        raise _schema_error(exc, repairs) from None
     return Result(value=value, attempts=1, repairs=repairs)
 
 

@@ -126,16 +126,18 @@ def test_single_quoted_object_keeps_apostrophe_inside_double_quoted_string() -> 
     assert result.repairs == ("single_quote",)
 
 
-def test_acceptance_literals_verbatim() -> None:
-    literals = [
-        r"""t\"}", S) returns value.a == "don""",
-        """ with repairs == ('single_quote',), and parse_reply('{\"""",
-        """', S) returns value.s == '""",
-        r""""Here's {x} then {\"""",
-    ]
-    assert all(literals)
-    result = parse_reply("{'a': \"don't\"}", S)
-    assert result.value.a == "don't"
+def test_tracebacks_never_contain_reply_text() -> None:
+    import traceback
+
+    reply = json.dumps({"a": SENTINEL})
+    with pytest.raises(SchemaValidationError) as direct:
+        parse_reply(reply, M)
+    text = "".join(traceback.format_exception(direct.value))
+    assert SENTINEL not in text
+    with pytest.raises(AttemptsExhaustedError) as info:
+        generate(FakeLLM(lambda messages: reply), USER, M, max_attempts=2)
+    text = "".join(traceback.format_exception(info.value))
+    assert SENTINEL not in text
 
 
 def test_python_literal_text_inside_string_is_untouched() -> None:

@@ -8,8 +8,11 @@ Validated structured output from LLM replies into Pydantic models, with linear J
 
 ## Problem
 
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
+LLM replies that should be JSON arrive wrapped in prose or code fences, with trailing commas,
+Python literals or fields that fail validation. Application code grows ad hoc regex repairs that
+corrupt string contents and unbounded retry loops that leak replies into logs. This library turns a
+raw reply into a validated Pydantic model through one linear, string-aware pass, or fails with a
+typed error after a bounded re-ask loop.
 
 ## Install
 
@@ -19,21 +22,27 @@ pip install trysac-llm-structured-output
 uv add trysac-llm-structured-output
 ```
 
-Requires Python 3.10 or newer. No runtime dependencies.
+Requires Python 3.10 or newer and pydantic>=2.7,<3.
 
 ## Usage
 
 ```python
-import llm_structured_output
+from pydantic import BaseModel
 
-# normalize() trims surrounding whitespace and lower-cases the text.
-print(llm_structured_output.normalize("  Hello World "))  # -> "hello world"
+from llm_structured_output import RecordedLLM, generate, parse_reply
 
-# Blank input is rejected explicitly instead of returning an empty string.
-try:
-    llm_structured_output.normalize("   ")
-except ValueError as exc:
-    print(f"rejected: {exc}")
+
+class M(BaseModel):
+    a: int
+
+
+result = parse_reply('```json\n{"a": 1,}\n```', M)
+print(result.value, result.repairs)  # a=1 ('strip_fence', 'trailing_comma')
+
+# Re-ask loop: invalid replies are answered with the list of errors.
+llm = RecordedLLM(["no json here", '{"a": 1}'])
+result = generate(llm, [{"role": "user", "content": "Give me JSON."}], M)
+print(result.attempts)  # 2
 ```
 
 ## Documentation
