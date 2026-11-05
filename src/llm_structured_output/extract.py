@@ -93,7 +93,7 @@ def _scan(text: str, start: int) -> _Scan | None:
         if state == _OUTSIDE:
             if ch in "{[":
                 if len(stack) >= _MAX_DEPTH:
-                    return None
+                    raise InvalidJsonError(i)
                 stack.append("}" if ch == "{" else "]")
                 out.append(ch)
                 pending_comma = -1
@@ -203,7 +203,10 @@ def extract_value(text: str, max_input_chars: int) -> tuple[str, tuple[Repair, .
         if start < 0:
             break
         pos = start + 1
-        scanned = _scan(region, start)
+        try:
+            scanned = _scan(region, start)
+        except InvalidJsonError as exc:
+            raise InvalidJsonError(offset + exc.position) from None
         if scanned is None:
             if failure is None:
                 failure = offset + len(region)
