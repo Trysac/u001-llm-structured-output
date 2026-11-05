@@ -83,7 +83,9 @@ class SchemaValidationError(StructuredOutputError):
         self.errors: list[tuple[str, str]] = list(errors)
         self.total = len(self.errors) if total is None else total
         self.repairs = repairs
-        super().__init__(f"schema validation failed with {self.total} error(s)", "schema_validation")
+        super().__init__(
+            f"schema validation failed with {self.total} error(s)", "schema_validation"
+        )
 
 
 class AttemptsExhaustedError(StructuredOutputError):
