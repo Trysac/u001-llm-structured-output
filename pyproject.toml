@@ -17,7 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+    "pydantic>=2.7,<3",
+]
 
 [project.urls]
 Homepage = "https://github.com/Trysac/u001-llm-structured-output"
