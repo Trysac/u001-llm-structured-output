@@ -1,7 +1,6 @@
 # llm-structured-output
 
-[![PyPI version](https://img.shields.io/pypi/v/trysac-llm-structured-output)](https://pypi.org/project/trysac-llm-structured-output/)
-[![License: MIT](https://img.shields.io/pypi/l/trysac-llm-structured-output)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/Trysac/u001-llm-structured-output/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u001-llm-structured-output/actions/workflows/ci.yml)
 
 Validated structured output from LLM replies into Pydantic models, with linear JSON extraction, string-safe repairs and a bounded re-ask loop
@@ -16,10 +15,12 @@ typed error after a bounded re-ask loop.
 
 ## Install
 
+Not published to PyPI yet. Install it from GitHub:
+
 ```sh
-pip install trysac-llm-structured-output
+pip install "git+https://github.com/Trysac/u001-llm-structured-output"
 # or
-uv add trysac-llm-structured-output
+uv add "git+https://github.com/Trysac/u001-llm-structured-output"
 ```
 
 Requires Python 3.10 or newer and pydantic>=2.7,<3.
